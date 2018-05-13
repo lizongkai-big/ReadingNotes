@@ -16,7 +16,7 @@
 
 2. 概念解释：
 
-   1. 可查异常 / 非运行时异常：CheckedException
+   1. 可查异常 / 非运行时异常 / 可控异常：CheckedException
 
       可查异常即**必须进行处理的异常**，要么try catch住,要么往外抛，谁调用，谁处理，比如 FileNotFoundException, ParseException以及**自定义异常**
       如果不处理，编译器，就不让你通过
@@ -42,4 +42,31 @@
 新建一个方法，该方法在使用时会抛出异常
 
 使用该方法时，捕获该异常
+
+
+
+### [为什么Java的checked exception是一个糟糕的特性](https://blog.csdn.net/kingzone_2008/article/details/8535287)
+
+1. 由于代码中不会到处都是try-catch块，带来的代码可读性下降；Unchecked异常不会使代码显得杂乱，因为其避免了不必要的try-catch块。
+2. 当被强制捕获或传播许多异常时，开发人员的效率会受到影响，也可能会对捕捉到的异常敷衍了事，仅仅`e.printStackTrace()` 
+3. checked异常声明聚集使方法声明显得杂乱；Unchecked异常不会因为异常声明聚集使方法声明显得杂乱。
+4. 关于容易忘记处理unchecked异常的观点在我的实践中没有发生。
+5. 关于无法获知如何处理未声明异常的观点在我的实践中没有发生。
+6. Unchecked异常避免了版本问题。
+
+
+
+try...catch...finaly
+
+```java
+// 结果返回2
+public static int testTry(){
+  try{
+    return 1;
+  }
+  finally {
+    return 2;
+  }
+}
+```
 

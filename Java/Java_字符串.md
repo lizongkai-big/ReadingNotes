@@ -1,3 +1,9 @@
+#### ###字符串比较
+
+字符串是对象，比较两个字符串是否相等要用equal！！
+
+
+
 ### 装箱拆箱
 
 1. 所有的基本类型，都有对应的类类型
@@ -33,6 +39,8 @@ i = Integer.valueOf(i).intValue()
 
 ### 格式化输出
 
+使用 **printf** 格式化输出
+
 ```java
 String sentenceFormat ="%s 在进行了连续 %d 次击杀后，获得了 %s 的称号%n";
 //使用printf格式化输出
@@ -43,7 +51,7 @@ System.out.printf(sentenceFormat,name,kill,title);
 
 用了很多System.arraycopy(src, srcPos, des, desPos, length);  src，des为char[]格式
 
-设计步骤：属性 -> 构造方法 带参构造方法 -> reverse(), **toString() ** -> insert(), append() -> delete()
+设计步骤：属性 -> 构造方法 带参构造方法 -> reverse(), **toString()** -> insert(), append() -> delete()
 
 注意capacity扩容，length变化；以及对参数的容错，比如start < 0, str == null
 

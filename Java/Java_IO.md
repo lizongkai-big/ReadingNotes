@@ -124,7 +124,9 @@ ObjectOutputStream    ObjectInputStream
 
 一个对象以流的形式进行传输，叫做序列化。该对象所对应的类，必须是**实现Serializable接口**
 
-**缓存流，数据流和对象流都必须<u>建立在一个存在的流的基础上</u>**
+**缓存流，数据流和对象流都必须<u>建立在一个存在的流的基础上**
+
+new FileOutStream(File file, boolean append);
 
 
 

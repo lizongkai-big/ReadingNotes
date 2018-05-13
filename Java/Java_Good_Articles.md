@@ -31,7 +31,7 @@
       System.out.println( i.equals(c)); //true
    2. 原因【[link](http://www.blogjava.net/zhangyuan/archive/2010/07/24/327011.html)】另：i，c是在堆中两个不同的对象，对于对象，“==”比较的是两个地址，所以i==c 为false
    3. cast an Object to an int     `int intValue = (int)object`
-   4. Integer 转 int `Integer.intValue()```
+   4. Integer 转 int `Integer.intValue()`
 
 6. array VS ArrayList [link]
 
@@ -44,7 +44,7 @@
 
 8. String VS StringBuilder
 
-   1. String 是静态的，但是可以重新赋值啊，如果要拼接字符串只好用StringBuilder
+   1. String 是静态的，但是可以重新赋值啊，如果要拼接字符串可以用+=，但是本质上是用StringBuilder
    2. StringBuilder append(String)  老麻烦的，应尽量避免
 
 9. String 字符串分割【[link](https://blog.csdn.net/kunlong0909/article/details/8507290)】
@@ -64,7 +64,7 @@
 
     1. HashMap在每个节点中储存**键值对对象 **Map.Entry
     2. hashing实现 (h = k.hashCode()) ^ (h >>> 16)
-    3. 
+    3. ​
 
 13. Java 8 中的 Streams API 详解 [[link](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)] --+
 
