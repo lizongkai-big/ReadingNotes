@@ -92,7 +92,7 @@ private  static void encodeFile(File encodingFile, File encodedFile){
       之后，将文件内容读入char[] ，然后通过String str = new String(char[]) ，之后输出识别出来的字符
 
 3. ```java
-   //byte[] --> String    字节表示的内容转字符串  
+   // byte[] --> String    字节表示的内容转字符串  
    String str = new String(byte[], charsetName);
    // String --> byte[]   获取字符串的某种编码方式的字节表示 
    byte[] bytes = str.getBytes(charsetName);
@@ -118,15 +118,42 @@ DataInputStream 数据输入流 DataOutputStream 数据输出流
 
 可以进行数据的格式化顺序读写
 
+**注**： <u>要用DataInputStream 读取一个文件，这个文件必须是由DataOutputStream 写出的，否则会出现EOFException，</u>因为DataOutputStream 在写出的时候会做一些特殊标记，只有DataInputStream 才能成功的读取。
+
 ### 对象流
 
 ObjectOutputStream    ObjectInputStream
 
 一个对象以流的形式进行传输，叫做序列化。该对象所对应的类，必须是**实现Serializable接口**
 
-**缓存流，数据流和对象流都必须<u>建立在一个存在的流的基础上**
+####serialVersionUID（不大重要，个人好奇）
 
-new FileOutStream(File file, boolean append);
+实现了Serializable接口之后，Eclipse就会提示你增加一个 serialVersionUID（IDEA没提示，这并不重要），虽然不加的话上述程序依然能够正常运行。
+
+如果是通过网络传输的话，如果Person类的serialVersionUID不一致，那么反序列化就不能正常进行。例如在客户端A中Person类的serialVersionUID=1L，而在客户端B中Person类的serialVersionUID=2L 那么就不能重构这个Person对象。
+
+如果没有特殊需求的话，使用用默认的 1L 就可以，这样可以确保代码一致时反序列化成功。那么随机生成的序列化 ID 有什么作用呢，有些时候，通过改变序列化 ID 可以用来限制某些用户的使用。
+
+### Tips
+
+1. **缓存流，数据流和对象流都必须建立在一个存在的流的基础上**
+
+2. new FileOutStream(File file, boolean append);  当append为true时，是向file文件中增添数据；为false，则覆盖原来的数据
+
+3. Windows系统里面，每行结尾是“<换行><回车>”，即“\r\n”；
+
+   （windows系统中）\r 就是return 回到 本行 行首 这就会把这一行以前的输出 覆盖掉
+
+   ```java
+   System.out.println("hello\rworld!"); // world!
+   System.out.println("\rworld!");  // world!
+   System.out.println("hello\r");  // hello
+   System.out.println("hello\rwor"); // wor
+   ```
+
+   所以，在IO中，读取文件中内容进行按行split时，应该使用"\r\n"
+
+
 
 
 

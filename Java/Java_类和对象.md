@@ -81,7 +81,11 @@ public Hero(String name,float hp){
 }
 ```
 
-3. 传参
+###传参
+
+基本类型传参（副本）
+
+类类型传参（引用）
 
 ```java
 //复活
@@ -147,7 +151,7 @@ public static Synchronized ThreadSafeSingleton getSingleInstance(){
 
 ```java
 // 双重检查锁定（double-checked locking）
-// 这看起来似乎两全其美，但是这是一个错误的优化！原因在于singObj = new DoubleCheckedSingleton()这一句。 http://www.cnblogs.com/big-xuyue/p/4074645.html
+// 这看起来似乎两全其美，但是这可能会因为一个错误的优化造成错误！原因在于singObj = new DoubleCheckedSingleton()这一句。 http://www.cnblogs.com/big-xuyue/p/4074645.html
 public static DoubleCheckedSingleton getSingleInstance(){  
   if(null == singObj ) { //第一次检查
     Synchronized(DoubleCheckedSingleton.class){     //加锁

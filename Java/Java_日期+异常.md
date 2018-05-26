@@ -1,5 +1,11 @@
 ### SimpleDateFormat
 
+//y 代表年 //M 代表月 //d 代表日 //H 代表24进制的小时 //h 代表12进制的小时 //m 代表分钟 //s 代表秒 //S 代表毫秒
+
+```java
+SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS" );
+```
+
 日期 ---> 字符串  String s = SimpleDateFormat.format(Date);
 
 字符串 ---> 日期  Date date = SimpleDateFormat.parse(String);
