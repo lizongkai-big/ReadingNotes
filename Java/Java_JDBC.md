@@ -153,6 +153,8 @@ execute与executeUpdate的相同点：都可以执行增加，删除，修改
 ### 获取自增长id
 
 ```java
+// 确保会返回自增长ID
+PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 ...
 // 执行完SQL的插入操作后，MySQL会为新插入的数据分配一个自增长id
 // JDBC通过getGeneratedKeys获取该id
@@ -169,7 +171,7 @@ if (rs.next()) {
 
 ## JDBC事务
 
-MYSQL 表的类型必须是INNODB才支持事务
+**MYSQL 表的类型必须是INNODB才支持事务**
 
 数据库事务必须具备ACID特性，ACID是Atomic（原子性）、Consistency（一致性）、Isolation（隔离性）和Durability（持久性）的英文缩写。
 

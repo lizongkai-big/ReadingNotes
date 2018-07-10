@@ -4,7 +4,7 @@
 
 File file = new File(pathName);
 
-常用方法：exist(), isFile(), isDirectory(), getAbsolutePath(), getName(), listFiles()
+常用方法：exist(), isFile(), isDirectory(), length(), getAbsolutePath(), getName(), listFiles(), getParentFile()
 
 ### 字节流
 

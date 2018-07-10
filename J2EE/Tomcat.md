@@ -63,9 +63,13 @@ taskkill /f /t /im java.exe
 
 ##Tomcat 组成
 
-![img](https://dn-mhke0kuv.qbox.me/9ccc3ed9de0df39faa1e.jpeg?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+[Tomcat结构及处理请求过程](http://objcoding.com/2017/06/12/Tomcat-structure-and-processing-request-process/)
 
-![img](https://pic002.cnblogs.com/images/2012/322938/2012090217005339.png)
+[tomcat中server.xml配置详解](https://blog.csdn.net/zcyhappy1314/article/details/10356909)
+
+![img](./image/tomcat_component.png)
+
+
 
 
 

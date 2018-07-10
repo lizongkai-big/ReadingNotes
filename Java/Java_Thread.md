@@ -183,7 +183,7 @@ lock(), unlock(), await(), signal(), signalAll()
 
 ###Lock和synchronized的区别
 
-1. Lock是一个**接口**，而synchronized是Java中的**关键字**，synchronized是**内置**的语言实现，Lock是**代码层面**的实现。
+1. Lock是一个**接口**，而synchronized是Java中的**关键字**，synchronized是**内置**的语言实现，Lock是**代码层面**的实现。所以synchronized使用方便，但Lock更灵活。
 2. Lock可以**选择性的获取锁**，如果一段时间获取不到，可以放弃。synchronized不行，会一根筋一直获取下去。 借助Lock的这个特性，就能够规避死锁，synchronized必须通过谨慎和良好的设计，才能减少死锁的发生。
 3. synchronized在发生异常和同步块结束的时候，会自动释放锁。而Lock必须**手动释放**， 所以如果忘记了释放锁，一样会造成死锁。
 4. [中断响应](https://blog.csdn.net/natian306/article/details/18504111) 在使用**synchronized**时，一旦一个线程发现自己得不到锁，就一直开始等待了，就算它等死，也得不到锁；即使我们中断它`reader.interrupt();` ，它都不来响应下，看来真的要等死了。
@@ -208,7 +208,7 @@ lock(), unlock(), await(), signal(), signalAll()
 
 ​	JDK6 以后，新增加了一个包java.util.concurrent.atomic，里面有各种原子类，比如AtomicInteger。
 
-​	而AtomicInteger提供了各种自增，自减等方法，这些方法都是原子性的。 换句话说，自增方法incrementAndGet 是线程安全的，同一个时间，只有一个线程可以调用这个方法。
+​	AtomicInteger提供了各种自增，自减等方法，这些方法都是原子性的。 换句话说，自增方法incrementAndGet 是线程安全的，同一个时间，只有一个线程可以调用这个方法。
 
 ### 缺点
 

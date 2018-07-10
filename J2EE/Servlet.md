@@ -1,12 +1,14 @@
+<u>Servlet 是 J2EE 最重要的一部分</u>，有了 Servlet 你就是 J2EE 了，J2EE 的其他方面的内容择需采用。而 Servlet 规范你需要掌握的就是 servlet 和 filter 这两项技术。绝大多数框架不是基于 servlet 就是基于 filter，如果它要在 Servlet 容器上运行，就永远也脱离不开这个模型。
+
 ##指定项目输出到classes目录
 
 **为什么要有这一步？** 在ecilpse中默认输出的class是在bin目录下，但是tomcat启动之后，在默认情况下，不会去bin目录找这些class文件，而是到WEB-INF/classes这个目录下去寻找。 所以通过这一步的配置，使得eclipse的class文件输出到WEB-INF/classes目录下，那么这样就**和tomcat兼容**了。 **IDEA也是如此**
 
-##get 与 post 的区别
+##[get 与 post 的区别](https://www.cnblogs.com/ranyonsue/p/5984001.html)
 
-1. 使用method="get" 提交数据 是常用的提交数据的方式；如果form元素没有提供method属性，**默认**就是get方式提交数据；get方式的一个特点就是，可以在浏览器的地址栏看到提交的参数，即便是密码也看得到
+1. 使用method="get" 提交数据 是常用的提交数据的方式；如果form元素没有提供method属性，**默认**就是get方式提交数据；get方式的一个特点就是，可以在浏览器的地址栏看到提交的参数，即便是密码也看得到（所以使用get方式提交数据，安全性较低）；如果数据是英文字母/数字，原样发送，如果是空格，转换为+，如果是中文/其他字符，则直接把字符串用BASE64加密，得出如： %E4%BD%A0%E5%A5%BD，其中％XX中的XX为该符号以16进制表示的ASCII。
 
-2. 使用method="post" 也可以提交数据，post不会在地址栏显示提交的参数 ，如果要提交二进制数据，比如**上传文件**，必须采用post方式
+2. 使用method="post" 也可以提交数据，post不会在地址栏显示提交的参数 ，如果要提交二进制数据，比如**上传文件**，必须采用post方式；提交的数据放置在是HTTP包的包体中。
 
 3. get 与 post 的区别
 
@@ -31,6 +33,18 @@
 <input type="submit" value="登录">
 </form>
 ```
+
+## HttpServletRequest 和 HttpServletResponse
+
+为什么我这么强调 HttpServletRequest 和 HttpServletResponse 这两个接口，因为 Web 开发是离不开 HTTP 协议的，而 Servlet 规范其实就是对 HTTP 协议做面向对象的封装，HTTP协议中的请求和响应就是对应了 HttpServletRequest 和 HttpServletResponse 这两个接口。
+
+你可以通过 HttpServletRequest 来获取所有请求相关的信息，包括 URI、Cookie、Header、请求参数（form中或者url中数据）等等，别无它路。因此当你使用某个框架时，你想获取HTTP请求的相关信息，只要拿到 HttpServletRequest 实例即可。
+
+而 HttpServletResponse接口是用来生产 HTTP 回应，包含 Cookie、Header 以及回应的内容等等。
+
+### 注：
+
+前台向servlet传参有两种方式，一种是使用表单form，一种是通过url；servlet接收参数是唯一的，都是`request.getParameter("name")`
 
 ##Service()
 
@@ -159,20 +173,22 @@ web.xml提供路径与servlet的映射关系
 ```xml
 <!-- 最简单的servlet配置 -->
 <servlet>
+  <!-- Servlet对象的名称 -->
   <servlet-name>HelloServlet</servlet-name>
+  <!-- 创建Servlet对象所要调用的类 -->
   <servlet-class>HelloServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
+  <!-- 要与servlet中的servlet-name配置节内容对应 -->
   <servlet-name>HelloServlet</servlet-name>
+  <!-- 客户访问的Servlet的相对URL路径 -->
   <url-pattern>/hello</url-pattern>
 </servlet-mapping>
 
 <!-- 复杂的servlet配置 -->
 <servlet>
-    <!-- Servlet对象的名称 -->
     <servlet-name>action<servlet-name>
-    <!-- 创建Servlet对象所要调用的类 -->
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
     <init-param>
         <!-- 参数名称 -->
@@ -191,10 +207,8 @@ web.xml提供路径与servlet的映射关系
     <!-- Servlet容器启动时加载Servlet对象的顺序 -->
     <load-on-startup>2</load-on-startup>
 </servlet>
-<!-- 要与servlet中的servlet-name配置节内容对应 -->
 <servlet-mapping>
     <servlet-name>action</servlet-name>
-    <!-- 客户访问的Servlet的相对URL路径 -->
     <url-pattern>*.do</url-pattern>
 </servlet-mapping>
 ```

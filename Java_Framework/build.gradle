@@ -1,0 +1,150 @@
+// 项目属性
+group 'com.buptnml'
+version '1.0-SNAPSHOT'
+
+// 定义一堆基础插件
+// 使用Java plugin
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+
+// 定义依赖仓库
+repositories {
+    mavenLocal()    // Gradle会尝试先从本地Maven缓存中获取jar包，这样会更快一些
+    mavenCentral()  // 定义仓库为maven中心仓库，使用Maven的容器获取依赖
+}
+
+//自定义property，配置外部属性
+ext {
+    spring_version = "5.0.6.RELEASE"
+}
+
+// 在configurations 中定义每组依赖
+configurations {
+    mybatisGenerator // 一组依赖，用来引入generator工具，mybatis的Generator插件入口
+}
+
+// 通过dependencies()方法向依赖组（自然包括mybatisGenerator）中加入实际的依赖项
+// 如果存在依赖冲突，在默认情况下，Gradle会选择最新版本
+// java Plugin会自动定义compile和testCompile，分别用于编译Java源文件和编译Java测试源文件。
+dependencies {
+    // 无法使用 gradle 引入的jar，可以放在libs目录里
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // 如果文件较少还可以单独引入
+    compile files('spring-core.jar', 'spring-aap.jar')
+    compile group: 'dom4j', name: 'dom4j', version: '1.6.1'
+    // 依赖管理:支持传递性依赖；也支持排除传递性依赖以及关闭传递性依赖
+    compile 'com.fasterxml.jackson.core:jackson-core:2.8.5'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.5'
+    compile 'org.springframework:spring-webmvc:4.3.7.RELEASE'
+    compile 'org.springframework:spring-orm:4.3.7.RELEASE'
+    compile 'org.springframework:spring-context-support:4.3.7.RELEASE'
+    compile 'org.springframework:spring-aop:5.0.0.RELEASE'
+    compile 'org.springframework:spring-aspects:5.0.0.RELEASE'
+    compile 'mysql:mysql-connector-java:5.1.38'
+    compile 'org.mybatis:mybatis:3.4.2'
+    compile 'org.mybatis:mybatis-spring:1.3.1'
+    compile 'com.github.pagehelper:pagehelper:5.0.0'
+    compile 'org.slf4j:slf4j-log4j12:1.7.25'
+    compile 'tk.mybatis:mapper:3.4.0'
+    compile 'com.alibaba:druid:1.0.31'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile "io.springfox:springfox-swagger2:2.7.0"
+    compile 'io.springfox:springfox-swagger-ui:2.7.0'
+
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+
+    //MyBatis
+    compile "org.mybatis:mybatis:3.0.5"
+
+    //mybatis spring 插件
+    compile "org.mybatis:mybatis-spring:1.0.1"
+
+    //数据库驱动
+    compile "mysql:mysql-connector-java:5.1.23"
+
+    //连接池
+    compile "com.alibaba:druid:1.0.12"
+
+    //json
+    compile "com.google.code.gson:gson:2.2.4"
+
+    //log4j
+    compile "log4j:log4j:1.2.17"
+
+    //使用Mybatis-Generator自动生成Dao、Model、Mapping相关文件
+    //generator-mybatis生成代码依赖，也就是给mybatisGenerator插件用的jar包
+    mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.3.5'
+    mybatisGenerator 'org.mybatis.generator:mybatis-generator-maven-plugin:1.3.5'
+    mybatisGenerator 'mysql:mysql-connector-java:5.1.38'
+    mybatisGenerator 'tk.mybatis:mapper:3.4.0'
+}
+
+// 读取配置文件jdbc.properties，其中有数据库连接信息，生成entity的包名，生成mapper的包名，生成dao的包名
+def getDbProperties = {
+    def properties = new Properties()
+    file("src/main/resources/jdbc.properties").withInputStream { inputStream ->
+        properties.load(inputStream)
+    }
+    properties
+}
+
+task mybatisGenerate  {
+    def properties = getDbProperties()
+    // projectDir是啥？
+    ant.properties['targetProject'] = projectDir.path
+    ant.properties['driverClass'] = properties.getProperty("jdbc_driver")
+    ant.properties['connectionURL'] = properties.getProperty("jdbc_url")
+    ant.properties['userId'] = properties.getProperty("jdbc_username")
+    ant.properties['password'] = properties.getProperty("jdbc_password")
+    // sourceSets是啥？方便你管理文件
+    ant.properties['src_main_java'] = sourceSets.main.java.srcDirs[0].path
+    ant.properties['modelPackage'] = properties.getProperty("model.package")
+    ant.properties['daoPackage'] = properties.getProperty("dao.package")
+    ant.properties['sqlMapperPackage'] = properties.getProperty("xml.sqlmapper.package")
+    ant.taskdef(
+            name: 'mbgenerator',
+            classname: 'org.mybatis.generator.ant.GeneratorAntTask',
+            // 将mybatisGenerator的依赖加入到classpath中
+            classpath: configurations.mybatisGenerator.asPath
+    )
+
+    ant.mbgenerator(overwrite: true,
+            configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
+        propertyset {
+            propertyref(name: 'targetProject')
+            propertyref(name: 'userId')
+            propertyref(name: 'driverClass')
+            propertyref(name: 'connectionURL')
+            propertyref(name: 'password')
+            propertyref(name: 'src_main_java')
+            propertyref(name: 'src_main_resources')
+            propertyref(name: 'modelPackage')
+            propertyref(name: 'daoPackage')
+            propertyref(name: 'sqlMapperPackage')
+        }
+    }
+}
+/*----------------------------------------------------------------------*/
+// 自定义Task
+class HelloWorldTask extends DefaultTask {
+    // 表示在配置该Task时，message是可选的
+    @Optional
+    String message = 'I am davenkin'
+
+    // @TaskAction表示该Task要执行的动作
+    @TaskAction
+    def hello(){
+        println "hello world $message"
+    }
+}
+
+// 使用默认的message
+task hello(type:HelloWorldTask)
+
+// 重新设置了message的值
+task hello1(type:HelloWorldTask){
+   message ="I am a programmer"
+}
