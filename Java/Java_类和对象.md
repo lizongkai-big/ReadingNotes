@@ -1,11 +1,43 @@
 1. 命名规则
    1. 类名（UpperCamelCase）：Hero
    2. 属性名、方法名（lowerCamelCase 风格）：name，getSpeed()
+
 2. 数组：
    1. 数组的长度是不可变的，一旦分配好空间，是多长，就多长，不能增加也不能减少；如果需要变长的数组，可以用Collection.ArrayList
    2. 数组复制System.arraycopy(src, srcPos, dest, destPos, length)
    3. for(int value : array) 增强型for循环
    4. Arrays类，用于对数组的复制，查找，排序，填充，输出
+
+3. Java 变量作用域
+
+   1. Java的变量作用域一共有四种，分别是类级、对象实例级、方法级、块级。
+
+   2. ```java
+      public class demo
+      {
+        public static String name = "hello";//类级变量
+        public int i;//对象级变量，默认为0
+        static{
+          int j = 1;//块级变量，只能在块内部访问
+        }
+        public void test()
+        {
+          int k = 2;//方法级变量，只能在该方法内使用
+          System.out.println("i=" + i);
+        }
+        public static void main(String[] args)
+        {
+          System.out.println("name");//类级变量不需要实例化对象就可使用
+          demo d = new demo();
+      	for (int i = 0; i < 10; i ++) { // 方法级变量
+            int j = 2;  // 块级变量
+      	}
+          d.test();
+        }
+      }
+      ```
+
+   3. ​
 
 ### 为什么要使用getter，setter方法？
 
@@ -188,43 +220,46 @@ public static Singleton getInstance()
   饿汉式的构造函数不能传递参数，因为饿汉式需要在类加载的时候就生成对象，那个时候无法传递参数。虽然通过重载getInstance(args)来传递参数，但是不起作用
 
   ```java
+  // 懒汉式
   public static Son getSonInstance(String s,int i){
-      if(son==null){
-          synchronized (Son.class) {
-              son=new Son(s,i);
-          }
+    if(son==null){ // son 为空，所以son会被重新赋值
+      synchronized (Son.class) {
+        son=new Son(s,i);
       }
-          return son;
+    }
+    return son;
   }
   ```
 
   懒汉式可以，通过重载getInstance(args)，进而使用重载的构造函数。
 
   ```java
+  // 静态内部类
   private static class LoadSonB {
-      private static final SonB SONB_INTANCE=new SonB();
+    private static final SonB SONB_INTANCE=new SonB();
   }
   public static SonB getInstance(String s1,int i1){
-      s=s1;
-      i=i1;
-      return LoadSonB.SONB_INTANCE;
+    s=s1;
+    i=i1;
+    return LoadSonB.SONB_INTANCE;
   }
   ```
 
   静态内部类的方式：因为静态内部类<u>在类加载的时候不会加载</u>，静态内部类和非静态内部类一样，都是在被调用时才会被加载，而静态变量、静态方法、静态块都是在类加载的时候就已经”准备好了”, 类加载的时候静态内部类还没加载，所以构造函数还没运行，当静态内部类被调用时，参数已经被赋值了，所以可以。
 
   ```java
+  // 饿汉式
   public class SonC extends Father{
     private static String s;
     private static int i;
     public SonC() {
-        super(s, i);
+      super(s, i);
     }
     private static SonC sonc=new SonC();
     public static SonC getInstance(String s1,int i1){
-        s=s1;
-        i=i1;
-        return sonc;
+      s=s1;
+      i=i1;
+      return sonc;
     }
   }
   ```

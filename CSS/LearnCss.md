@@ -6,7 +6,7 @@ cursor：规定要显示的光标的类型（形状）。
 
 line-height：行高
 
-overflow：如果元素中的内容超出了给定的宽度和高度属性，overflow 属性可以确定是否显示滚动条等行为。
+overflow：元素尺寸 > 容器，overflow 属性可以确定是否显示滚动条等行为。有visible，hidden，scroll 和 auto 属性值。
 
 http://luopq.com/2015/11/08/CSS-float/
 
@@ -42,13 +42,13 @@ border：边框
 
 position：规定元素的定位类型。
 
-​	absolute：通过绝对定位，元素可以放置到页面上的任何位置。
+​	absolute：通过相对于父元素的绝对定位，所以元素可以放置到页面上的任何位置。
 
 ​	relative：相对定位会按照元素的原始位置对该元素进行移动。。 因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
 
-​	fixed：生成绝对定位的元素，相对于浏览器窗口进行定位。
+​	fixed：生成绝对定位的元素，相对于浏览器窗口进行定位，元素也可以放置到页面上的任何位置。
 
-​	static：默认值，没有定位
+​	static：默认值，没有特殊的定位效果，就是按照图片的先后顺序排列。
 
 ​	inherit：从父元素继承position属性的值
 
@@ -58,4 +58,7 @@ display： 规定元素应该生成的框的类型。http://www.w3school.com.cn/
 
 <dl>、<dt>、<dd>通常被称为定义性列表。
 
+img 的 alt 属性：替代文本。如果无法显示图像，浏览器将显示替代文本。
+
 ​	
+

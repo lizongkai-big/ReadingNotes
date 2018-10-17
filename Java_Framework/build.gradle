@@ -7,6 +7,7 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'war'
 
+// JDK 版本号
 sourceCompatibility = 1.8
 
 // 定义依赖仓库
@@ -22,19 +23,21 @@ ext {
 
 // 在configurations 中定义每组依赖
 configurations {
-    mybatisGenerator // 一组依赖，用来引入generator工具，mybatis的Generator插件入口
+    mybatisGenerator // 一组依赖，用来引入generator工具，mybatis的Generator插件入口；由于 MyBatis Generator 尚不支持 Gradle，所以只能使用 Gradle 来执行 Ant Task，达到相同的效果。
 }
 
 // 通过dependencies()方法向依赖组（自然包括mybatisGenerator）中加入实际的依赖项
 // 如果存在依赖冲突，在默认情况下，Gradle会选择最新版本
 // java Plugin会自动定义compile和testCompile，分别用于编译Java源文件和编译Java测试源文件。
+// 依赖管理:支持传递性依赖；也支持排除传递性依赖以及关闭传递性依赖
 dependencies {
     // 无法使用 gradle 引入的jar，可以放在libs目录里
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // 如果文件较少还可以单独引入
     compile files('spring-core.jar', 'spring-aap.jar')
+    // 用来读写XML文件
     compile group: 'dom4j', name: 'dom4j', version: '1.6.1'
-    // 依赖管理:支持传递性依赖；也支持排除传递性依赖以及关闭传递性依赖
+    // Jackson框架是基于Java平台的一套数据处理工具，被称为“最好的Java Json解析器”。
     compile 'com.fasterxml.jackson.core:jackson-core:2.8.5'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.5'
@@ -54,6 +57,7 @@ dependencies {
     compile "io.springfox:springfox-swagger2:2.7.0"
     compile 'io.springfox:springfox-swagger-ui:2.7.0'
 
+    //servlet依赖
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
     //MyBatis
@@ -82,6 +86,11 @@ dependencies {
     mybatisGenerator 'tk.mybatis:mapper:3.4.0'
 }
 
+war {
+    // 项目名称
+    archiveName = 'ssm_lzk.war'
+}
+
 // 读取配置文件jdbc.properties，其中有数据库连接信息，生成entity的包名，生成mapper的包名，生成dao的包名
 def getDbProperties = {
     def properties = new Properties()
@@ -93,6 +102,7 @@ def getDbProperties = {
 
 task mybatisGenerate  {
     def properties = getDbProperties()
+    // 把配置注入ant任务
     // projectDir是啥？
     ant.properties['targetProject'] = projectDir.path
     ant.properties['driverClass'] = properties.getProperty("jdbc_driver")
@@ -111,6 +121,7 @@ task mybatisGenerate  {
             classpath: configurations.mybatisGenerator.asPath
     )
 
+    // 运行ant,生成文件
     ant.mbgenerator(overwrite: true,
             configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
         propertyset {

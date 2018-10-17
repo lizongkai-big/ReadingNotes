@@ -1,4 +1,122 @@
+[TOC]
+
 <u>Servlet 是 J2EE 最重要的一部分</u>，有了 Servlet 你就是 J2EE 了，J2EE 的其他方面的内容择需采用。而 Servlet 规范你需要掌握的就是 servlet 和 filter 这两项技术。绝大多数框架不是基于 servlet 就是基于 filter，如果它要在 Servlet 容器上运行，就永远也脱离不开这个模型。
+
+## 生命周期
+
+https://my.oschina.net/xianggao/blog/395327
+
+http://www.cnblogs.com/cuiliang/archive/2011/10/21/2220671.html
+
+直接来看，一个Servlet的生命周期由 实例化，初始化，提供服务，销毁，被回收 几个步骤组成；
+
+![](./image/java_servlet_lifeCircle.png)
+
+实例化，也就是创建 / 装载 Servlet对象的时机
+
+1. 默认情况下，在Servlet **容器**启动后：客户首次向Servlet发出请求，Servlet容器会判断内存中是否存在指定的Servlet对象，如果没有则创建它，然后根据客户的请求创建HttpRequest、HttpResponse对象，从而调用Servlet对象的service方法；
+
+2. Servlet容器启动时：当web.xml文件中如果`<servlet>`元素中指定了`<load-on-startup>`子元素时，Servlet容器在启动web服务器时，将按照顺序**创建并初始化Servlet对象；** Servlet容器在启动时自动创建Servlet，这是由在web.xml文件中为Servlet设置的`<load-on-startup>`属性决定的。
+
+   ```xml
+   <loadon-startup>1</loadon-startup> # 1 表示第一个被创建并初始化；取值范围是1-99
+   ```
+
+3. Servlet的类文件被更新后，重新创建Servlet。
+
+4. 总结：从中我们也能看到同一个类型的Servlet对象在Servlet容器中以**单例**的形式存在；
+
+Servlet的典型生命周期
+
+1. 初始化，init(ServletConfig)方法：负责初始化Servlet对象，在Servlet的生命周期中，该方法执行一次；<u>**该方法（init()）**执行在单线程的环境下，因此开发者不用考虑线程安全的问题</u>；初始化的目的是为了让Servlet对象在处理客户端请求前完成一些初始化的工作，如建立数据库的连接，获取配置信息等。在初始化期间，Servlet实例可以使用容器为它准备的ServletConfig对象从Web应用程序的配置信息（在web.xml中配置）中获取初始化的参数信息。
+2. 提供服务，service(ServletRequest req,ServletResponse res)方法：负责响应客户的请求；为了提高效率，Servlet规范要求一个Servlet实例必须能够同时服务于多个客户端请求，即**service()方法运行在多线程的环境下，Servlet开发者必须保证该方法的线程安全性；**
+3. 销毁，destroy()方法：**Servlet容器停止或者重新启动** ，也就是当Servlet对象退出生命周期时，负责释放占用的资源；
+
+在整个Servlet的生命周期过程中，创建Servlet实例、调用实例的init()和destroy()方法都只进行一次，当初始化完成后，Servlet容器会将该实例保存在内存中，通过调用它的service()方法，为接收到的请求服务。下面给出Servlet整个生命周期过程的UML序列图，如图所示。
+
+![](./image/java_servlet_lifeCircle3.jpg)
+
+从客户端与web服务器的交互来看，
+
+![](./image/java_servlet_lifeCircle2.jpg)
+
+
+
+Servlet容器如何知道创建哪一个Servlet对象？Servlet对象如何配置？实际上这些信息是通过读取web.xml配置文件来实现的。
+
+### 自启动
+
+有的时候会有这样的业务需求： 
+tomcat一启动，就需要执行一些初始化的代码，比如校验数据库的完整性等。
+
+对于这种需求，可以利用web.xml的`<load-on-startup>`配置节信息，对HelloSevlet增加一句`<load-on-startup>10</load-on-startup>` ， 然后在该servlet的init()方法中执行初始化代码
+
+**缺点：** web.xml中的listener、servlet 可以在tomcat启动后执行 但不能注解
+
+如果想在tomcat启动后自动执行SSM框架中带注解的操作，可以在spring-mvc.xml中添加一个bean，设置其init-method 属性即可 [reference](https://blog.csdn.net/qq_30264689/article/details/80683764)
+
+### [servlet 是线程安全的吗？](https://www.cnblogs.com/chanshuyi/p/5052426.html)
+
+不是，首先需要了解Servlet容器（即Tomcat）使如何响应HTTP请求的。
+
+当Tomcat接收到Client的HTTP请求时，Tomcat从线程池中取出一个线程，之后找到该请求对应的Servlet对象并进行初始化，之后调用service()方法。要注意的是每一个Servlet对象再Tomcat容器中只有一个实例对象，即是单例模式。如果多个HTTP请求请求的是同一个Servlet，那么着两个HTTP请求对应的线程将**并发调用Servlet**的service()方法。
+
+**此时如果Servlet中定义了实例变量或静态变量，那么可能会发生线程安全问题**（因为所有的线程都可能使用这些变量）。
+
+![](./image/servlet_is_not_thread_safe.png)
+
+## web.xml 配置
+
+web.xml提供路径与servlet的映射关系
+
+<servlet> 标签下的 <servlet-name>  与 <servlet-mapping> 标签下的 <servlet-name> 必须一样
+
+<servlet-name>与<servlet-class>可以不一样，但是为了便于理解与维护，一般都会写的一样。 一目了然
+
+```xml
+<!-- 最简单的servlet配置 -->
+<servlet>
+  <!-- Servlet对象的名称 -->
+  <servlet-name>HelloServlet</servlet-name>
+  <!-- 创建Servlet对象所要调用的类 -->
+  <servlet-class>HelloServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <!-- 要与servlet中的servlet-name配置节内容对应 -->
+  <servlet-name>HelloServlet</servlet-name>
+  <!-- 客户访问的Servlet的相对URL路径 -->
+  <url-pattern>/hello</url-pattern>
+</servlet-mapping>
+
+<!-- 复杂的servlet配置 -->
+<servlet>
+    <servlet-name>action<servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+        <!-- 参数名称 -->
+        <param-name>config</param-name>
+        <!-- 参数值 -->
+        <param-value>/WEB-INF/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+        <param-name>detail</param-name>
+        <param-value>2</param-value>
+    </init-param>
+    <init-param>
+        <param-name>debug</param-name>
+        <param-value>2</param-value>
+    </init-param>
+    <!-- Servlet容器启动时加载Servlet对象的顺序 -->
+    <load-on-startup>2</load-on-startup>
+</servlet>
+<servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+```
+
+​	当Servlet容器启动的时候读取`<servlet>`配置节信息，根据`<servlet-class>`配置节信息创建Servlet对象，同时根据`<init-param>`配置节信息创建HttpServletConfig对象，然后执行Servlet对象的init方法，并且根据`<load-on-startup>`配置节信息来决定创建Servlet对象的顺序，如果此配置节信息为负数或者没有配置，那么在Servlet容器启动时，将不加载此Servlet对象。当客户访问Servlet容器时，Servlet容器根据客户访问的URL地址，通过`<servlet-mapping>`配置节中的`<url-pattern>`配置节信息找到指定的Servlet对象，并调用此Servlet对象的service方法。
 
 ##指定项目输出到classes目录
 
@@ -119,108 +237,6 @@ Servlet继承了HttpServlet,同时也继承了一个方法 `service(HttpServletR
 ```java
 response.setContentType("text/html; charset=UTF-8");
 ```
-
-## 生命周期
-
-https://my.oschina.net/xianggao/blog/395327
-
-http://www.cnblogs.com/cuiliang/archive/2011/10/21/2220671.html
-
-直接来看，一个Servlet的生命周期由 实例化，初始化，提供服务，销毁，被回收 几个步骤组成；
-
-![](./image/java_servlet_lifeCircle.png)
-
-实例化，也就是创建 / 装载 Servlet对象的时机
-
-1. 默认情况下，在Servlet **容器**启动后：客户首次向Servlet发出请求，Servlet容器会判断内存中是否存在指定的Servlet对象，如果没有则创建它，然后根据客户的请求创建HttpRequest、HttpResponse对象，从而调用Servlet对象的service方法；
-
-2. Servlet容器启动时：当web.xml文件中如果`<servlet>`元素中指定了`<load-on-startup>`子元素时，Servlet容器在启动web服务器时，将按照顺序**创建并初始化Servlet对象；** Servlet容器在启动时自动创建Servlet，这是由在web.xml文件中为Servlet设置的`<load-on-startup>`属性决定的。
-
-   ```xml
-   <loadon-startup>1</loadon-startup> # 1 表示第一个被创建并初始化；取值范围是1-99
-   ```
-
-3. Servlet的类文件被更新后，重新创建Servlet。
-
-4. 总结：从中我们也能看到同一个类型的Servlet对象在Servlet容器中以**单例**的形式存在；
-
-Servlet的典型生命周期
-
-1. 初始化，init(ServletConfig)方法：负责初始化Servlet对象，在Servlet的生命周期中，该方法执行一次；该方法执行在单线程的环境下，因此开发者不用考虑线程安全的问题；初始化的目的是为了让Servlet对象在处理客户端请求前完成一些初始化的工作，如建立数据库的连接，获取配置信息等。在初始化期间，Servlet实例可以使用容器为它准备的ServletConfig对象从Web应用程序的配置信息（在web.xml中配置）中获取初始化的参数信息。
-2. 提供服务，service(ServletRequest req,ServletResponse res)方法：负责响应客户的请求；为了提高效率，Servlet规范要求一个Servlet实例必须能够同时服务于多个客户端请求，即**service()方法运行在多线程的环境下，Servlet开发者必须保证该方法的线程安全性；**
-3. 销毁，destroy()方法：**Servlet容器停止或者重新启动** ，也就是当Servlet对象退出生命周期时，负责释放占用的资源；
-
-在整个Servlet的生命周期过程中，创建Servlet实例、调用实例的init()和destroy()方法都只进行一次，当初始化完成后，Servlet容器会将该实例保存在内存中，通过调用它的service()方法，为接收到的请求服务。下面给出Servlet整个生命周期过程的UML序列图，如图所示。
-
-![](./image/java_servlet_lifeCircle3.jpg)
-
-从客户端与web服务器的交互来看，
-
-![](./image/java_servlet_lifeCircle2.jpg)
-
-
-
-Servlet容器如何知道创建哪一个Servlet对象？Servlet对象如何配置？实际上这些信息是通过读取web.xml配置文件来实现的。
-
-## web.xml
-
-web.xml提供路径与servlet的映射关系
-
-<servlet> 标签下的 <servlet-name>  与 <servlet-mapping> 标签下的 <servlet-name> 必须一样
-
-<servlet-name>与<servlet-class>可以不一样，但是为了便于理解与维护，一般都会写的一样。 一目了然
-
-```xml
-<!-- 最简单的servlet配置 -->
-<servlet>
-  <!-- Servlet对象的名称 -->
-  <servlet-name>HelloServlet</servlet-name>
-  <!-- 创建Servlet对象所要调用的类 -->
-  <servlet-class>HelloServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-  <!-- 要与servlet中的servlet-name配置节内容对应 -->
-  <servlet-name>HelloServlet</servlet-name>
-  <!-- 客户访问的Servlet的相对URL路径 -->
-  <url-pattern>/hello</url-pattern>
-</servlet-mapping>
-
-<!-- 复杂的servlet配置 -->
-<servlet>
-    <servlet-name>action<servlet-name>
-    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-    <init-param>
-        <!-- 参数名称 -->
-        <param-name>config</param-name>
-        <!-- 参数值 -->
-        <param-value>/WEB-INF/struts-config.xml</param-value>
-    </init-param>
-    <init-param>
-        <param-name>detail</param-name>
-        <param-value>2</param-value>
-    </init-param>
-    <init-param>
-        <param-name>debug</param-name>
-        <param-value>2</param-value>
-    </init-param>
-    <!-- Servlet容器启动时加载Servlet对象的顺序 -->
-    <load-on-startup>2</load-on-startup>
-</servlet>
-<servlet-mapping>
-    <servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
-</servlet-mapping>
-```
-
-​	当Servlet容器启动的时候读取`<servlet>`配置节信息，根据`<servlet-class>`配置节信息创建Servlet对象，同时根据`<init-param>`配置节信息创建HttpServletConfig对象，然后执行Servlet对象的init方法，并且根据`<load-on-startup>`配置节信息来决定创建Servlet对象的顺序，如果此配置节信息为负数或者没有配置，那么在Servlet容器启动时，将不加载此Servlet对象。当客户访问Servlet容器时，Servlet容器根据客户访问的URL地址，通过`<servlet-mapping>`配置节中的`<url-pattern>`配置节信息找到指定的Servlet对象，并调用此Servlet对象的service方法。
-
-## 自启动
-
-有的时候会有这样的业务需求： 
-tomcat一启动，就需要执行一些初始化的代码，比如校验数据库的完整性等。
-
-对于这种需求，可以利用web.xml的`<load-on-startup>`配置节信息，对HelloSevlet增加一句`<load-on-startup>10</load-on-startup>` ， 然后在该servlet的init()方法中执行初始化代码
 
 ## 跳转
 

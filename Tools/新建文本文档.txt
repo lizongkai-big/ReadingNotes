@@ -1,0 +1,1 @@
+1. https://famousmotto.codeday.me/api/getRandom 返回一条code 相关的名言，是Unicode编码

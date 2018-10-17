@@ -12,6 +12,17 @@
 
 如果你手里只有榔头，那么你看到的任何东西都像钉子。
 
+验证只是一个工具，它有助于你成为一个好程序员，但它却不是我们追求的理想
+
+# JS 基础知识
+
+1. 全局变量 VS 局部变量
+   1. JavaScript的变量的域是根据方法块来划分的，**是function块，而不是for、while和if块**。因为在JavaScript中没有块作用域。所以块内的变量可以在方法内使用；
+   2. 在方法内不使用var 声明变量，则该变量相当于隐式声明为全局变量
+2. 字符 -> 数值 parseInt, parseFloat
+3. 浮点数 -> 整数  Math.ceil(), Math.floor(), Math.round()
+4. element.property = value; JS 为元素创建属性，这是一种介乎全局变量和局部变量之间的东西，而且只与element 这个特定元素有关
+
 #DOM
 
 节点类型：
@@ -43,6 +54,11 @@ var another = $(divDom); // 重新把DOM包装为jQuery对象
 # JS
 
 充斥着回调函数
+
+## [setTimeout](https://jeffjade.com/2016/01/10/2016-01-10-javacript-setTimeout/)
+
+1. setTimeout函数用来指定某个函数或某段代码，**在多少毫秒之后执行**。
+2. setTimeout传参数
 
 ## Promise
 
@@ -80,3 +96,4 @@ job1.then(job2).then(job3).catch(handleError);
 ```
 
 其中，`job1`、`job2`和`job3`都是Promise对象。
+

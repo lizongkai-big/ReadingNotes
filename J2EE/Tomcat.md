@@ -1,3 +1,60 @@
+## Tomcat VS Apache
+
+### [Server](https://zhuanlan.zhihu.com/p/22544725 )
+
+1. 什么是Server？server 可以代指硬件或软件，然而它们都是协同工作的。对于开发者来说，一般指的是后者，也就是一个 24 小时运行的软件程序。
+2. [什么是Web Server？](https://developer.mozilla.org/zh-CN/docs/Learn/Common_questions/What_is_a_web_server)（仅从软件角度考虑）提供 Web 服务的 Server。
+   1. 一个 Web Server 包括几个控制网络用户如何访问托管文件的部分，至少是一个 HTTP 服务器 [*HTTP server*]。一个 HTTP 服务器是一个能理解URLs (网络地址) 和 HTTP (你的浏览器查看网页时所用的协议) 的软件。
+   2. 在最基础的层次，每当一个浏览器需要一个网络服务器上的托管文件时，浏览器会通过 HTTP 请求这个文件。当这个请求到达了正确的网络服务器（硬件），这个 HTTP 服务器（软件）返回所请求的文档，同样通过 HTTP。
+   3. 要发布一个网站，你需要一个静态或动态的服务器。
+3. 分类：
+   1. Static Web Server：由一个计算机（硬件）和一个 HTTP 服务器（软件）组成。我们称它为 “**静态**” 因为这个服务器把它的托管文件 “**保持原样**” 地传送到你的浏览器。如 Apache
+   2. Dynamic Web Server：由一个静态的网络服务器加上额外的软件组成，最普遍的是 *application server* + *database* （例如：Tomcat + Mysql）。我们称它为 “**动态**” 因为这个应用服务器会在通过 HTTP 服务器传送托管文件到你的浏览器之前对这些托管文件进行**更新**。
+
+### Apache
+
+APACHE 是一个web服务器环境程序 启用他可以作为web服务器使用 不过只支持静态网页 如(asp,php,cgi,jsp)等动态网页的就不行 
+
+### Tomcat
+
+它只是一个 servlet (jsp也翻译成servlet)容器，可以认为是 Apache 的扩展，但是**可以独立于 Apache 运行**
+
+### 相同点
+
+1. 两者都是**Apache组织**开发的 
+2. 两者都有 HTTP 服务的功能 
+3. 两者都是免费的 
+
+### 区别
+
+1. Apache是Web服务器，Web服务器传送(serves)页面使浏览器可以浏览，Web服务器专门处理HTTP请求(request)，但是应用程序服务器是通过很多协议来为应用程序提供 (serves)商业逻辑(business logic)。Tomcat是运行在Apache上的应用服务器，应用程序服务器提供的是客户端应用程序可以调用(call)的方法 (methods)。它只是一个servlet(jsp也翻译成servlet)容器，可以认为是Apache的扩展，但是可以独立于apache运行。
+2. Apache是普通服务器，本身只支持html静态普通网页。不过可以通过插件支持PHP，还可以与Tomcat连通(单向Apache连接Tomcat,就是说通过Apache可以访问Tomcat资源，反之不然)，Tomcat是jsp/servlet容器，同时也支持HTML、JSP、ASP、PHP、CGI等，其中CGI需要一些手动调试，不过很容易的。
+3. Apache侧重于http server，Tomcat侧重于servlet引擎，如果以standalone方式运行，功能上Tomcat与apache等效支持JSP，但对静态网页不太理想。
+4. Apache可以运行一年不重启，稳定性非常好，而Tomcat则不见得。
+5. 首选web服务器是Apache，但Apache解析不了的jsp、servlet才用tomcat。
+6. Apache是做开始的页面解析服务，tomcat是后研发出来的，从本质上来说tomcat的功能完全可以替代Apache，但Apache毕竟是tomcat的前辈级人物，并且市场上也有不少人还在用Apache，所以Apache还会继续存在，不会被取代，apache不能解析java的东西，但解析html速度快。
+
+### 两者整合
+
+Apache是一个web服务器环境程序，启用他可以作为web服务器使用不过只支持静态网页，不支持动态网页，如asp、jsp、php、cgi
+
+如果要在Apache环境下运行jsp就需要一个解释器来执行jsp网页，而这个jsp解释器就是Tomcat
+
+那为什么还要JDK呢？因为jsp需要连接数据库的话就要jdk来提供连接数据库的驱程，所以要运行jsp的web服务器平台就需要APACHE+TOMCAT+JDK
+
+整合的好处：
+
+1. 如果客户端请求的是静态页面，则只需要Apache服务器响应请求
+2. 如果客户端请求动态页面，则是Tomcat服务器响应请求
+3. 因为jsp是服务器端解释代码的，这样整合就可以减少Tomcat的服务开销
+
+### links
+
+1. https://zhuanlan.zhihu.com/p/22544725 
+2. https://developer.mozilla.org/zh-CN/docs/Learn/Common_questions/What_is_a_web_server
+3. https://www.cnblogs.com/warioland/archive/2011/12/05/2276729.html
+4. https://blog.csdn.net/ithomer/article/details/7839906
+
 ## 改端口
 
 修改server.xml，将8080替换为别的端口号。
