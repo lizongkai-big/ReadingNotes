@@ -35,3 +35,12 @@ System.out.println("把集合向右滚动2个单位，标的数据后，集合�
 System.out.println(numbers);
 ```
 
+2. ArrayList
+
+   ```java
+   // c.toArray might (incorrectly) not return Object[] (see 6260652)
+   //反射,获取数组类型,判定c.toArray类型是否为Object[]类型
+   elementData.getClass() != Object[].class
+
+
+   ```

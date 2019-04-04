@@ -43,7 +43,7 @@
 
 **5-8还不理解**
 
-1. <u>方便增加额外功能。如setter()中增加参数验证功能，getter()使得内部存储于外部表现不同</u> 
+1. <u>方便增加额外功能。如setter()中增加参数验证功能，getter()使得内部存储与外部表现不同</u> 
 2. <u>可以保持外部接口不变的情况下，修改内部存储方式和逻辑。</u>
 3. <u>提供一个debug接口。</u>
 4. <u>允许继承者改变语义。</u>
@@ -67,7 +67,43 @@ public void attack(Hero... heros) {
 }
 ```
 
-### this
+### 重写Override
+
+​	同名同参同返回类型
+
+​	子类可以继承父类的对象方法；在继承后，重复提供该方法，就叫做方法的重写；又叫覆盖 override
+
+1、在子类中可以根据需要对从基类中继承来的方法进行重写。
+
+2、重写的方法和被重写的方法必须具有相同方法名称、参数列表和返回类型。
+
+3、重写方法不能使用比被重写的方法更严格的访问权限。
+
+### 隐藏
+
+​	与重写类似，方法的重写是子类覆盖父类的对象方法 ；隐藏，就是子类覆盖父类的**类方法** （类中static修饰的方法）
+
+### 重载 OverLoad
+
+同名不同参，返回值无关。
+
+1、必须具有不同的参数列表；
+
+2、可以有不同的返回类型，只要参数列表不同就可以；
+
+3、可以有不同的访问修饰符；
+
+4、可以抛出不同的异常；
+
+5、方法能够在一个类中或者在一个子类中被重载。
+
+### 重载 VS 重写
+
+
+
+### [this](http://www.weixueyuan.net/view/5988.html)
+
+this 只有在类实例化后才有意义，this 与该实例等价，通过 this 可以调用本对象的所有方法和属性。
 
 1. 通过this访问属性
 
@@ -83,7 +119,7 @@ public void setName1(String name){//wrong
 public void setName2(String heroName){ // right
   name = heroName;
 }
-//通过this访问属性
+//通过this访问属性，区分同名变量
 public void setName3(String name){ //right
   //name代表的是参数name
   //this.name代表的是属性name
@@ -153,7 +189,7 @@ public static void main(String[] args) {
 
 ### [单例模式](http://how2j.cn/k/class-object/class-object-singleton/349.html#nowhere)
 
-指的的一个类，在一个JVM里，只有一个实例存在。
+在一个JVM里，**保证一个类仅有一个实例，并提供一个访问它的全局访问点。**
 
 单例模式三要素
 
@@ -267,3 +303,9 @@ public static Singleton getInstance()
   而使用饿汉式，由于sonc属于static变量，而且在声明的时候new了，那时参数还没有赋值时，构造函数已经被调用了，sonc已经被赋值了，所以不能对sonc造成改变。
 
   从**构造函数传参+线程安全**来看，使用单例模式的时候，**最好使用内部类的方式来实现。**
+
+基于volatile的双重锁定检查
+
+枚举单例
+
+使用容器实现单例模式

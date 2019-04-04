@@ -1,3 +1,5 @@
+[TOC]
+
 ## 执行过程
 
 为什么JSP可以在html中运行java代码？ 这是因为JSP被转译成了 Servlet
@@ -132,6 +134,11 @@ session 的运行依赖 session id，而 session id 是存在 cookie 中的，�
 ###注
 
 session不会因为浏览器的关闭而删除。但是**存有session ID的cookie**的**默认过期时间是会话级别**。<u>也就是用户关闭了浏览器，那么存储在客户端的session ID便会丢失</u>，但是存储在服务器端的session数据并不会被立即删除。从客户端即浏览器看来，好像session被删除了一样（因为我们丢失了session ID，找不到原来的session数据了）。
+
+URL地址重写 
+
+- 是对<u>客户端不支持Cookie的解决方案</u>。
+- 原理: 是将该用户Session的id信息重写到URL地址中。服务器能够解析重写后的URL获取Session的id。这样即使客户端不支持Cookie，也可以使用Session来记录用户状态。
 
 ## 作用域
 

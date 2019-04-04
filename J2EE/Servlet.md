@@ -240,9 +240,9 @@ response.setContentType("text/html; charset=UTF-8");
 
 ## 跳转
 
-跳转的方式有两种，服务端跳转和客户端跳转
+跳转的方式有两种，服务端跳转（**转发**）和客户端跳转（**重定向** ）
 
-### 服务端跳转
+### 服务端跳转（转发）
 
 在Servlet中进行服务端跳转的方式：
 
@@ -250,7 +250,7 @@ response.setContentType("text/html; charset=UTF-8");
 
 服务端跳转可以看到浏览器的地址依然是/login 路径，并不会变成success.html
 
-### 客户端跳转
+### 客户端跳转（重定向）
 
 在Servlet中进行客户端跳转的方式（302 临时跳转的方式）：
 
@@ -264,16 +264,28 @@ response.setContentType("text/html; charset=UTF-8");
 
 可以观察到，浏览器地址发生了变化，变为.../fail.html
 
-页面的路径是相对路径。sendRedirect可以将页面跳转到任何页面，不一定局限于本web应用中，如： 
+页面的路径是相对路径。sendRedirect可以将页面跳转到任何页面，<u>不一定局限于本web应用中</u>，如： 
 response.sendRedirect("http://www.baidu.com"); // 别忘了写 **http://**
 
 该方法通过修改HTTP协议的HEADER部分,对浏览器下达重定向指令的，让浏览器对在location中指定的URL提出请求，使浏览器显示重定向网页的内容。
 
 该方法可以接受绝对的或相对的URLs。如果传递到该方法的参数是一个相对的URL，那么Web container在将它发送到客户端前会把它转换成一个绝对的URL。
 
-###两者区别
+###[两者区别](https://blog.csdn.net/meiyalei/article/details/2129120)
+
+特殊消息一般为状态码：302（暂时重定向）或者301（永久重定向）
 
 ![](./image/java_servlet_jump.png)
+
+转发是服务器行为，重定向是客户端行为。
+
+转发浏览器做了一次request，重定向浏览器做了两次request
+
+转发对浏览器是透明的，感觉不到服务器做了转发；重定向的话，用户可以观察到地址栏url的变化
+
+重定向可以重定向到任意URL，转发的路径必须是同一个文本容器下的url，不能转向其他的web路径
+
+重定向案例：z.cn --> amazon.cn A网址更加用户友好，缺点：会造成网址劫持，我辛辛苦苦做的网站，被别人拿来做重定向的地址，搜索引擎却以为是别人做的
 
 ## Request常用用法
 

@@ -22,9 +22,9 @@ Threads are sometimes called *lightweight processes*. Threads exist within a pro
 
 多线程即在同一时间，可以做多件事情。 多线程就相当于主线程找了个助手来做一些事，但是这些助手要和主线程争用CPU等各种资源。
 
-**有了多线程**，因为很多操作不具有原子性，所以出现混乱；
+**有了多线程**，因为很多操作不具有**原子性**，所以出现混乱；
 
-所以就有了**锁**，因为有些操作要满足一定条件，所以又有了**条件对象**；因为多线程会无序地争夺锁和条件对象，就出现了死锁和阻塞问题，
+所以就有了**锁**，因为有些操作要满足一定条件，所以又有了**条件对象**；因为多线程会无序地争夺锁和条件对象，就出现了**死锁和阻塞**问题，
 
 对于死锁，java不提供一个可靠的解决方案，程序员只好仔细设计程序；
 
@@ -45,7 +45,7 @@ Threads are sometimes called *lightweight processes*. Threads exist within a pro
 
 ###实现Runnable接口
 
-创建类Battle，实现Runnable接口
+创建类Battle，实现Runnable接口（重写run方法）
 
 启动的时候，首先创建一个Battle对象，然后再根据该battle对象创建一个线程对象，并启动
 
@@ -55,11 +55,13 @@ Battle battle1 = new Battle(gareen,teemo);
 new Thread(battle1).start(); 
  ```
 
+#### run() OR start() ?
+
 battle1 对象实现了Runnable接口，所以有run方法，但是直接调用run方法，并不会启动一个新的线程。
 
 必须，借助一个线程对象的start()方法，才会启动一个新的线程。
 
-所以，在创建Thread对象的时候，把battle1作为构造方法的参数传递进去，这个线程启动的时候，就会去执行battle1.run()方法了。
+所以，在创建Thread对象的时候，把battle1作为构造方法的参数传递进去，这个线程启动start的时候，就会去执行battle1.run()方法了。
 
 ###匿名类
 
@@ -90,6 +92,8 @@ setDaemon(): 设置线程为守护线程， 当一个进程里，所有的线程
 
 ## 同步
 
+**同步格言**：如果向一个变量写入值，而这个变量接下来可能会被另一个线程读取，或者，从一个变量读值，而这个变量可能是之前被另一个线程写入的，此时必须使用同步。
+
 多线程的同步问题指的是多个线程同时修改一个数据的时候，可能导致的问题；又叫Concurrency 问题
 
 ### synchronized 关键字
@@ -106,7 +110,7 @@ synchronized (someObject){
 
 1. synchronized(**someObject**)
 
-   所有需要修改hp的地方，有要建立在占有someObject的基础上。 
+   所有需要修改hp的地方，都要建立在占有someObject的基础上。 
 
    而对象 someObject在同一时间，只能被一个线程占有。 间接地，导致同一时间，hp只能被一个线程修改。
 
@@ -144,7 +148,7 @@ synchronized (someObject){
 
 如果一个类，其方法**都是有synchronized**修饰的，那么该类就叫做线程安全的类
 
-同一时间，只有一个线程能够进入 这种类的一个实例 的去修改数据，进而保证了这个实例中的数据的安全(不会同时被多线程修改而变成脏数据)
+同一时间，只有一个线程能够进入 这种类的一个实例的去修改数据，进而保证了这个实例中的数据的安全(不会同时被多线程修改而变成脏数据)
 
 ###把非线程安全的集合转换为线程安全
 
@@ -157,7 +161,7 @@ List<Integer> list2 = Collections.synchronizedList(list1);
 
 ![线程死锁](./image/java_死锁.png)
 
-##交互
+##线程的交互方式
 
 ###不好的解决方式
 
@@ -209,11 +213,11 @@ threadPool.execute(new Runnable(){
 
 ### 常用方法
 
-lock(), unlock(), await(), signal(), signalAll()
+lock(), tryLock(), tryLock(long timeout, TimeUnit unit), lockInterruptibly(), unlock(), await(), signal(), signalAll()
 
-###Lock和synchronized的区别
+###Lock和synchronized的区别 **
 
-1. Lock是一个**接口**，而synchronized是Java中的**关键字**，synchronized是**内置**的语言实现，Lock是**代码层面**的实现。所以synchronized使用方便，但Lock更灵活。
+1. Lock是一个**Java类**，而synchronized是Java中的**关键字**，synchronized是**内置**的语言实现，Lock是**代码层面**的实现。synchronized 提供对与每个对象相关联的隐式监视器锁的访问，但是**强制**所有锁获取和释放以**块结构**的方式发生：当获取多个锁时，它们必须以相反的顺序被释放，并且所有的锁都必须被释放在与它们相同的语义范围内。虽然`synchronized`方法和语句的范围机制使得使用监视器锁更容易编程，并且有助于避免涉及锁的许多常见编程错误，但是有时您需要以更灵活的方式处理锁。 所以synchronized使用简单方便，但Lock更灵活。
 2. Lock可以**选择性的获取锁**，如果一段时间获取不到，可以放弃。synchronized不行，会一根筋一直获取下去。 借助Lock的这个特性，就能够规避死锁，synchronized必须通过谨慎和良好的设计，才能减少死锁的发生。
 3. synchronized在发生异常和同步块结束的时候，会自动释放锁。而Lock必须**手动释放**， 所以如果忘记了释放锁，一样会造成死锁。
 4. [中断响应](https://blog.csdn.net/natian306/article/details/18504111) 在使用**synchronized**时，一旦一个线程发现自己得不到锁，就一直开始等待了，就算它等死，也得不到锁；即使我们中断它`reader.interrupt();` ，它都不来响应下，看来真的要等死了。
@@ -232,7 +236,7 @@ lock(), unlock(), await(), signal(), signalAll()
 
 ### 概念
 
-原子性操作即不可中断的操作，比如赋值操作；原子性操作本身是线程安全的 
+**原子性操作即不可中断的操作**，比如赋值操作；原子性操作本身是线程安全的 
 
 ### AtomicInteger
 
@@ -284,3 +288,19 @@ join可以让他们结束，然后主线程继续执行。
 3. 线程必然不是越多越好，线程切换也是要开销的，<u>当你增加一个线程的时候，增加的额外开销要小于该线程能够消除的阻塞时间</u>，这才叫物有所值。
 4. 多核也要用多线程才能发挥优势。同样，多线程要在多核上才能真正有优势。
 
+
+
+
+## 疑惑
+
+
+
+```
+https://blog.csdn.net/caoxiaohong1005/article/details/79382600
+* Note that the {@code wait} method, as it places the current thread
+* into the wait set for this object, unlocks only this object; any
+* other objects on which the current thread may be synchronized remain
+* locked while the thread waits.
+注意:由于wait方法是将当前线程放到了当前对象的wait集合里面,所以当wait方法结束时,解锁的也只是当前这个对象; // 不应该解锁线程吗？
+* 当前线程用于同步的其他对象会保持线程调用wait方法时的锁状态.(关于这句话的理解,举个例子:线程如果因为m(m>1)个资源被阻塞,那么得到1个资源时,只是这个资源可以从wait状态恢复,其他的(m-1)个资源依旧是wait状态.因为当前线程的运行还需要其他(m-1)个资源,因此此时的线程还是不能够运行的.)
+```
